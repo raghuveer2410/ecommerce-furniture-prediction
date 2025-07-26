@@ -5,7 +5,7 @@ import numpy as np
 import joblib
 
 # Load model
-model = joblib.load("model/furniture_model.pkl")
+model = joblib.load("models/furniture_model.pkl")
 
 # UI Title
 st.title("🪑 E-Commerce Furniture Sales Predictor")
