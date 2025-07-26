@@ -1,36 +1,29 @@
-
 import streamlit as st
 import pandas as pd
-import numpy as np
 import joblib
+import os
 
-# Load model
-model = joblib.load("model/furniture_model.pkl")
+# Load model from models/ folder
+model_path = os.path.join("models", "furniture_model.pkl")
+model = joblib.load(model_path)
 
-# UI Title
-st.title("🪑 E-Commerce Furniture Sales Predictor")
-st.markdown("Predict **sales volume** for your furniture based on marketing, traffic, and ratings.")
+st.title("🛋️ E-commerce Furniture Sales Predictor")
 
-# Sidebar inputs
-st.sidebar.header("Input Features")
-TV = st.sidebar.slider("TV Advertising ($)", 0, 300, 150)
-Radio = st.sidebar.slider("Radio Advertising ($)", 0, 100, 50)
-Social_Media = st.sidebar.slider("Social Media Advertising ($)", 0, 300, 100)
-Influencer = st.sidebar.selectbox("Influencer Type", ["Nano", "Micro", "Macro", "Mega"])
-Traffic = st.sidebar.slider("Website Traffic (visits)", 0, 100000, 50000)
-Product_Views = st.sidebar.slider("Product Views", 0, 10000, 5000)
-Add_to_Cart = st.sidebar.slider("Add to Cart", 0, 5000, 1000)
-Rating = st.sidebar.slider("Average Rating", 0.0, 5.0, 4.0, 0.1)
+st.markdown("### Enter Marketing and Traffic Data")
 
-# Categorical encoding
-influencer_map = {"Nano": 0, "Micro": 1, "Macro": 2, "Mega": 3}
-Influencer_encoded = influencer_map[Influencer]
+# Input fields
+tv = st.number_input("TV Advertising Budget", min_value=0)
+radio = st.number_input("Radio Advertising Budget", min_value=0)
+social = st.number_input("Social Media Budget", min_value=0)
+influencer = st.selectbox("Influencer Category", [0, 1, 2, 3])
+traffic = st.number_input("Website Traffic", min_value=0)
+views = st.number_input("Product Views", min_value=0)
+cart = st.number_input("Add to Cart Count", min_value=0)
+rating = st.slider("Average Product Rating", 1.0, 5.0, 4.0, step=0.1)
 
-# Prepare input
-input_data = pd.DataFrame([[TV, Radio, Social_Media, Influencer_encoded, Traffic, Product_Views, Add_to_Cart, Rating]],
-                          columns=["TV", "Radio", "Social_Media", "Influencer", "Traffic", "Product_Views", "Add_to_Cart", "Rating"])
-
-# Predict
+# Prediction
 if st.button("Predict Sales"):
-    prediction = model.predict(input_data)[0]
-    st.success(f"📦 Predicted Sales Volume: **{int(prediction):,} units**")
+    input_df = pd.DataFrame([[tv, radio, social, influencer, traffic, views, cart, rating]],
+                            columns=["TV", "Radio", "Social_Media", "Influencer", "Traffic", "Product_Views", "Add_to_Cart", "Rating"])
+    prediction = model.predict(input_df)[0]
+    st.success(f"📈 Predicted Sales: ₹{int(prediction):,}")
